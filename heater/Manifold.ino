@@ -42,7 +42,8 @@ const halfway = sensor_range / 2;
 const quarterway = sensor_range / 4;
 
 /* whether to switch to full power if there are requests from both
-   sides of the root valve */
+   sides of the root valve
+ */
 const auto_full_on = 0;
 
 // Create the motor shield object with the default I2C address
@@ -55,11 +56,19 @@ typedef struct {
   int range;                    /* difference in sensor readings between the two ends */
 } manifold_valve;
 
+/* The arrangement of outputs is such that the pairs which are
+   likeliest to be on at the same time (tent and loadspace for
+   camping, front and middle for driving) are on different outputs of
+   the root valve, which I hope will make for the best airflow.
+ */
 manifold_valve root;            /* splits the hot air between upper and lower */
 manifold_valve upper;           /* splits hot air between middle and loadspace */
 manifold_valve lower;           /* splits hot air between tent and front */
 
-Adafruit_DCMotor *clutch_solenoids;
+/* We need to operate the clutches before driving the motors. I hope
+   it will work to treat them collectively as a motor.
+ */
+Adafruit_DCMotor *clutch_solenoids = AFMS.getMotor(4);
 
 void clutches(int on) {
   clutch_solenoids->run(on ? FORWARD : RELEASE);
@@ -97,6 +106,10 @@ void setup() {
   clutches(0);
 }
 
+/* Move a valve to a set position.  The positions are specified in the
+   scale that analogRead uses, and are scaled to suit the movement
+   range of that particular valve.
+ */
 void set_position(manifold_valve valve, int new_position) {
 
   new_position = valve->lowest + ((new_position * valve->range) / sensor_range);
@@ -124,12 +137,10 @@ void loop() {
   int tent_on = digitalRead(tent_request);
 
   if (front_on || middle_on || loadspace_on || tent_on) {
-  
-    /* todo: define scaling factors according to the actual and desired airflows in each output */
-  
-    int upper_position = halfway + middle_on*halfway - loadspace_on*halfway;
-    int lower_position = halfway + front_on*halfway - tent_on*halfway;
-    int root_position = halfway + (middle_on*quarterway + loadspace_on*quarterway) - (front_on*quarterway + tent_on*quarterway);
+    int upper_position = halfway + middle_on*halfway - front_on*halfway;
+    int lower_position = halfway + loadspace_on*halfway - tent_on*halfway;
+    /* todo: I don't think this is right */
+    int root_position = halfway + (middle_on*quarterway + front_on*quarterway) - (loadspace_on*quarterway + tent_on*quarterway);
 
     set_position(&root, root_position);
     set_position(&upper, upper_position);
