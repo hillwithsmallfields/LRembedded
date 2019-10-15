@@ -41,6 +41,10 @@ const sensor_range = 1023;
 const halfway = sensor_range / 2;
 const quarterway = sensor_range / 4;
 
+/* whether to switch to full power if there are requests from both
+   sides of the root valve */
+const auto_full_on = 0;
+
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 
@@ -132,7 +136,9 @@ void loop() {
     set_position(&lower, lower_position);
     clutches(0);
     digitalWrite(heater_on, HIGH);
-    if ((middle_on || loadspace_on) && (front_on || tent_on)) {
+    if (auto_full_on
+        && (middle_on || loadspace_on)
+        && (front_on || tent_on)) {
       digitalWrite(heater_full, HIGH);
     }
   } else {
