@@ -1,6 +1,19 @@
 /*
 
-  Controller for a valve manifold and Eberspacher D7L
+  Controller for a valve manifold and Eberspacher D7L for my Land Rover.
+
+  The mechanical hardware it controls is three linear actuators with
+  clutches (built as throttle motors for cruise control) each
+  operating a Y-flap valve directing the incoming air in two
+  directions in variable proportions.  The valves are arranged as a
+  tree, to give four destinations for the air: the front of the cab,
+  the second row seats, the loadspace, and a pipe up to a roofrack
+  tent.
+
+  The arduino takes in heat requests from switches in the four areas,
+  and sets the valves up to divide the hot air from the heater between
+  all the areas that are requesting it.  It also switches the heater
+  on and off appropriately.
 
   Uses https://github.com/adafruit/Adafruit_Motor_Shield_V2_Library
 
@@ -23,58 +36,78 @@ int tent_request = 4;
 int heater_on = 5;
 int heater_full = 6;
 
+const long_enough_to_detect_movement = 50;
+const sensor_range = 1023;
+const halfway = sensor_range / 2;
+const quarterway = sensor_range / 4;
+
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 
 typedef struct {
   Adafruit_DCMotor *motor;
-  int sensor;
-  int lowest;
-  int highest;
+  int sensor;                   /* each motor has a potentiometer to measure its position */
+  int lowest;                   /* value from the sensor at the furthest back position */
+  int range;                    /* difference in sensor readings between the two ends */
 } manifold_valve;
 
 manifold_valve root;            /* splits the hot air between upper and lower */
 manifold_valve upper;           /* splits hot air between middle and loadspace */
 manifold_valve lower;           /* splits hot air between tent and front */
 
+Adafruit_DCMotor *clutch_solenoids;
+
+void clutches(int on) {
+  clutch_solenoids->run(on ? FORWARD : RELEASE);
+}
+
 void calibrate(manifold_valve *valve) {
+  /* move a motor in both directions, registering where it gets stuck
+     at the limit of its travel */
   valve->motor->setSpeed(10);
   int position = analogRead(valve->sensor);
   int prev = -1;
-  valve->motor->run(FORWARD);
-  while (position != prev) {
-    delay(50);
-    position = analogRead(valve->sensor);
-  }
-  valve->highest = position;
   valve->motor->run(BACKWARD);
   while (position != prev) {
-    delay(50);
+    delay(long_enough_to_detect_movement);
     position = analogRead(valve->sensor);
   }
   valve->lowest = position;
+  valve->motor->run(FORWARD);
+  while (position != prev) {
+    delay(long_enough_to_detect_movement);
+    position = analogRead(valve->sensor);
+  }
+  valve->range = position - valve->lowest;
 }
 
 void setup() {
   AFMS.begin();
   pinMode(heater_on, OUTPUT);
   pinMode(heater_full, OUTPUT);
+  clutch_solenoids->setSpeed(255);
+  clutches(1);
   root.motor = AFMS.getMotor(1); root.sensor = A0; calibrate(&root);
   upper.motor = AFMS.getMotor(2); upper.sensor = A1; calibrate(&upper);
   lower.motor = AFMS.getMotor(3); lower.sensor = A2; calibrate(&lower);
+  clutches(0);
 }
 
 void set_position(manifold_valve valve, int new_position) {
 
-  /* todo: use the values from the valve calibration to scale new_position */
-
+  new_position = valve->lowest + ((new_position * valve->range) / sensor_range);
+  
   int position = analogRead(valve->sensor);
+  if (position != new_position) {
+    clutches(1);
+  }
   while (position != new_position) {
     if (position < new_position) {
       valve->motor->run(FORWARD);
     } else {
       valve->motor->run(BACKWARD);
     }
+    delay(long_enough_to_detect_movement);
     position = analogRead(sensor);
   }
   valve->motor->run(RELEASE);
@@ -90,13 +123,14 @@ void loop() {
   
     /* todo: define scaling factors according to the actual and desired airflows in each output */
   
-    int upper_position = 127 + middle_on*127 - loadspace_on*127;
-    int lower_position = 127 + front_on*127 - tent_on*127;
-    int root_position = 127 + (middle_on*63 + loadspace_on*63) - (front_on*63 + tent_on*63);
+    int upper_position = halfway + middle_on*halfway - loadspace_on*halfway;
+    int lower_position = halfway + front_on*halfway - tent_on*halfway;
+    int root_position = halfway + (middle_on*quarterway + loadspace_on*quarterway) - (front_on*quarterway + tent_on*quarterway);
 
     set_position(&root, root_position);
     set_position(&upper, upper_position);
     set_position(&lower, lower_position);
+    clutches(0);
     digitalWrite(heater_on, HIGH);
     if ((middle_on || loadspace_on) && (front_on || tent_on)) {
       digitalWrite(heater_full, HIGH);
