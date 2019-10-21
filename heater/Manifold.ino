@@ -23,6 +23,17 @@
 
   pins A4 and A5 are used by the motor shield for SDA and SCL
 
+    |-----+--------+-----------------|
+    | pin | wire   | function        |
+    |-----+--------+-----------------|
+    |   1 | green  | common negative |
+    |   2 | red    | positive        |
+    |   3 | white  | position        |
+    |   4 | blue   | clutch          |
+    |   5 | yellow | motor           |
+    |   6 | orange | motor           |
+    |-----+--------+-----------------|
+
  */
 
 #include <Wire.h>
@@ -36,10 +47,17 @@ int tent_request = 4;
 int heater_on = 5;
 int heater_full = 6;
 
+/* delay */
 const long_enough_to_detect_movement = 50;
+
+/* sensor scale */
 const sensor_range = 1023;
 const halfway = sensor_range / 2;
 const quarterway = sensor_range / 4;
+
+/* motors */
+const low_speed = 16;
+const normal_speed = 128;
 
 /* whether to switch to full power if there are requests from both
    sides of the root valve
@@ -65,19 +83,10 @@ manifold_valve root;            /* splits the hot air between upper and lower */
 manifold_valve upper;           /* splits hot air between middle and loadspace */
 manifold_valve lower;           /* splits hot air between tent and front */
 
-/* We need to operate the clutches before driving the motors. I hope
-   it will work to treat them collectively as a motor.
- */
-Adafruit_DCMotor *clutch_solenoids = AFMS.getMotor(4);
-
-void clutches(int on) {
-  clutch_solenoids->run(on ? FORWARD : RELEASE);
-}
-
 void calibrate(manifold_valve *valve) {
   /* move a motor in both directions, registering where it gets stuck
      at the limit of its travel */
-  valve->motor->setSpeed(10);
+  valve->motor->setSpeed(low_speed);
   int position = analogRead(valve->sensor);
   int prev = -1;
   valve->motor->run(BACKWARD);
@@ -93,18 +102,16 @@ void calibrate(manifold_valve *valve) {
   }
   valve->range = position - valve->lowest;
   valve->motor->run(RELEASE);
+  valve->motor->setSpeed(normal_speed);
 }
 
 void setup() {
   AFMS.begin();
   pinMode(heater_on, OUTPUT);
   pinMode(heater_full, OUTPUT);
-  clutch_solenoids->setSpeed(255);
-  clutches(1);
   root.motor = AFMS.getMotor(1); root.sensor = A0; calibrate(&root);
   upper.motor = AFMS.getMotor(2); upper.sensor = A1; calibrate(&upper);
   lower.motor = AFMS.getMotor(3); lower.sensor = A2; calibrate(&lower);
-  clutches(0);
 }
 
 /* Move a valve to a set position.  The positions are specified in the
@@ -116,9 +123,6 @@ void set_position(manifold_valve valve, int new_position) {
   new_position = valve->lowest + ((new_position * valve->range) / sensor_range);
   
   int position = analogRead(valve->sensor);
-  if (position != new_position) {
-    clutches(1);
-  }
   while (position != new_position) {
     if (position < new_position) {
       valve->motor->run(FORWARD);
@@ -146,7 +150,6 @@ void loop() {
     set_position(&root, root_position);
     set_position(&upper, upper_position);
     set_position(&lower, lower_position);
-    clutches(0);
     digitalWrite(heater_on, HIGH);
     if (auto_full_on
         && (middle_on || loadspace_on)
