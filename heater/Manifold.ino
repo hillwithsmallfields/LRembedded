@@ -92,6 +92,7 @@ void calibrate(manifold_valve *valve) {
     position = analogRead(valve->sensor);
   }
   valve->range = position - valve->lowest;
+  valve->motor->run(RELEASE);
 }
 
 void setup() {
