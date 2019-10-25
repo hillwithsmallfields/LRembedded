@@ -34,6 +34,8 @@
     |   6 | orange | motor           |
     |-----+--------+-----------------|
 
+    The clutches draw 1/3 of an amp each.
+
  */
 
 #include <Wire.h>
@@ -83,6 +85,8 @@ manifold_valve root;            /* splits the hot air between upper and lower */
 manifold_valve upper;           /* splits hot air between middle and loadspace */
 manifold_valve lower;           /* splits hot air between tent and front */
 
+Adafruit_DCMotor *clutches;
+
 void calibrate(manifold_valve *valve) {
   /* move a motor in both directions, registering where it gets stuck
      at the limit of its travel */
@@ -109,9 +113,12 @@ void setup() {
   AFMS.begin();
   pinMode(heater_on, OUTPUT);
   pinMode(heater_full, OUTPUT);
+  clutches = AFMS.getMotor(4);
+  clutches->run(FORWARD);
   root.motor = AFMS.getMotor(1); root.sensor = A0; calibrate(&root);
   upper.motor = AFMS.getMotor(2); upper.sensor = A1; calibrate(&upper);
   lower.motor = AFMS.getMotor(3); lower.sensor = A2; calibrate(&lower);
+  clutches->run(RELEASE);
 }
 
 /* Move a valve to a set position.  The positions are specified in the
@@ -147,9 +154,15 @@ void loop() {
     /* todo: I don't think this is right */
     int root_position = halfway + (middle_on*quarterway + front_on*quarterway) - (loadspace_on*quarterway + tent_on*quarterway);
 
-    set_position(&root, root_position);
-    set_position(&upper, upper_position);
-    set_position(&lower, lower_position);
+    if ((analogRead(root.sensor) != root_position)
+        || analogRead(upper.sensor) != upper_position
+        || analogRead(lower.sensor) != lower_position) {
+      clutches->run(FORWARD);
+      set_position(&root, root_position);
+      set_position(&upper, upper_position);
+      set_position(&lower, lower_position);
+      clutches->run(RELEASE);
+    }
     digitalWrite(heater_on, HIGH);
     if (auto_full_on
         && (middle_on || loadspace_on)
