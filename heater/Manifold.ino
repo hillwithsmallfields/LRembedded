@@ -23,18 +23,22 @@
 
   pins A4 and A5 are used by the motor shield for SDA and SCL
 
-    |-----+--------+-----------------|
-    | pin | wire   | function        |
-    |-----+--------+-----------------|
-    |   1 | green  | common negative |
-    |   2 | red    | positive        |
-    |   3 | white  | position        |
-    |   4 | blue   | clutch          |
-    |   5 | yellow | motor           |
-    |   6 | orange | motor           |
-    |-----+--------+-----------------|
+    |-----+-------------+-------------+-----------------|
+    | pin | linact wire | box wire    | function        |
+    |-----+-------------+-------------+-----------------|
+    |   1 | green       | green       | common negative |
+    |   2 | red         | red         | positive        |
+    |   3 | white       | salmon      | position        |
+    |   4 | blue        | blue        | clutch          |
+    |   5 | yellow      | orange/blue | motor           |
+    |   6 | orange      | orange      | motor           |
+    |-----+-------------+-------------+-----------------|
 
     The clutches draw 1/3 of an amp each.
+
+    cover over motors: 260 wide x 72 high x 92 deep, 23mm above top of
+    lower part of bracket; link to lower part of motor bracket is
+    towards rear.
 
  */
 
