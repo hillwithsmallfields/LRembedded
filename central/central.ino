@@ -41,8 +41,9 @@
 #define HUB_DATA 4
 
 #define IGNITION 5
+#define AUDIO_AMP 6
 
-#define ONE_WIRE_BUS 6
+#define ONE_WIRE_BUS 7
 
 #define MAIN_VOLTAGE A0
 #define MAIN_VOLTAGE_SCALE 4.0 /* adjust to calibrate voltage divider */
@@ -57,6 +58,7 @@ DallasTemperature sensors(&oneWire);
 void setup() {
   pinMode(PHABLET_POWER_SWITCH, OUTPUT);
   pinMode(HUB_SERIAL_CLOCK, OUTPUT);
+  pinMode(AUDIO_AMP, OUTPUT);
   sensors.begin();
 }
 
