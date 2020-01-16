@@ -20,3 +20,11 @@ The tallest upright should come down by 2cm.
 Add another pivot holder on the outside of the upper right.
 
 Move the lower right pivot holder back, maybe shorten by 1cm.
+
+Introduction
+============
+
+The Eberspächer D7L heater blows air into a tree of Y-valves, operated
+by motors controlled by an Arduino, which has four incoming request
+lines.  It adjusts the valve positions to share the hot air between
+the active requests.
