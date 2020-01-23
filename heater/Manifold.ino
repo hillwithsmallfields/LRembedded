@@ -36,10 +36,6 @@
 
     The clutches draw 1/3 of an amp each.
 
-    cover over motors: 260 wide x 72 high x 92 deep, 23mm above top of
-    lower part of bracket; link to lower part of motor bracket is
-    towards rear.
-
  */
 
 #include <Wire.h>
