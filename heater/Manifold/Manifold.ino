@@ -50,21 +50,21 @@ int heater_on = 5;
 int heater_full = 6;
 
 /* delay */
-const long_enough_to_detect_movement = 50;
+const int long_enough_to_detect_movement = 50;
 
 /* sensor scale */
-const sensor_range = 1023;
-const halfway = sensor_range / 2;
-const quarterway = sensor_range / 4;
+const int sensor_range = 1023;
+const int halfway = sensor_range / 2;
+const int quarterway = sensor_range / 4;
 
 /* motors */
-const low_speed = 16;
-const normal_speed = 128;
+const int low_speed = 16;
+const int normal_speed = 128;
 
 /* whether to switch to full power if there are requests from both
    sides of the root valve
  */
-const auto_full_on = 0;
+const int auto_full_on = 0;
 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
@@ -125,7 +125,7 @@ void setup() {
    scale that analogRead uses, and are scaled to suit the movement
    range of that particular valve.
  */
-void set_position(manifold_valve valve, int new_position) {
+void set_position(manifold_valve *valve, int new_position) {
 
   new_position = valve->lowest + ((new_position * valve->range) / sensor_range);
   
@@ -137,7 +137,7 @@ void set_position(manifold_valve valve, int new_position) {
       valve->motor->run(BACKWARD);
     }
     delay(long_enough_to_detect_movement);
-    position = analogRead(sensor);
+    position = analogRead(valve->sensor);
   }
   valve->motor->run(RELEASE);
 }
