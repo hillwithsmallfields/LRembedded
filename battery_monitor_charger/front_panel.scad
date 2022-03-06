@@ -18,11 +18,11 @@ module analog_meter() {
      boltsize = 3;
 
      translate([diameter/2, diameter/2]) {
-          circle(d=diameter, center=true);
-          translate([-holes_h/2, -holes_v/2]) circle(d=boltsize, center=true);
-          translate([holes_h/2, -holes_v/2]) circle(d=boltsize, center=true);
-          translate([-holes_h/2, holes_v/2]) circle(d=boltsize, center=true);
-          translate([holes_h/2, holes_v/2]) circle(d=boltsize, center=true);
+          circle(d=diameter);
+          translate([-holes_h/2, -holes_v/2]) circle(d=boltsize);
+          translate([holes_h/2, -holes_v/2]) circle(d=boltsize);
+          translate([-holes_h/2, holes_v/2]) circle(d=boltsize);
+          translate([holes_h/2, holes_v/2]) circle(d=boltsize);
      }
 }
 
@@ -30,7 +30,7 @@ module front_panel() {
      difference() {
           square([234, 97]);
           translate([15, 40]) LCD_cutout();
-          translate([170, 70]) large_connector();
+          translate([177, 70]) large_connector();
           translate([170, 40]) small_connector();
           translate([200, 40]) small_connector();
           translate([120, 40]) analog_meter();
