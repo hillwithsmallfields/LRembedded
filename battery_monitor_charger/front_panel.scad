@@ -34,7 +34,7 @@ module front_panel() {
      corner_hole_diameter = 3;
      difference() {
           square([width, height]);
-          translate([15, 40]) LCD_cutout();
+          translate([13, 40]) LCD_cutout();
           translate([177, 70]) large_connector();
           translate([170, 40]) small_connector();
           translate([200, 40]) small_connector();
