@@ -1,3 +1,4 @@
+/* Rear panel of garage computer / trickle charger */
 
 module iec(width, height, corner_depth, hole_spacing) {
      union([]) {
@@ -15,11 +16,11 @@ module iec(width, height, corner_depth, hole_spacing) {
 }
 
 module mains_inlet() {
-     iec(26, 18, 5, 40);
+     iec(28, 19, 5, 40);
 }
 
 module mains_outlet() {
-     iec(32, 23, 8, 40);
+     iec(33, 25, 8, 40);
 }
 
 module rect_hole_with_bolt_holes(width, height, hole_spacing, hole_offset, hole_diameter) {
@@ -43,8 +44,12 @@ module HDMI() {
 }
 
 module rear_panel() {
+     width = 234;
+     height = 97;
+     corner_hole_inset = 4.5;
+     corner_hole_diameter = 3;
      difference() {
-          square([234, 97]);
+          square([width, height]);
           translate([0, 75]) {
                translate([30, 0]) mains_inlet();
                translate([80, 0]) mains_outlet();
@@ -54,6 +59,10 @@ module rear_panel() {
                translate([205, 0]) rotate([0, 0, 90]) USB();
                translate([220, 0]) rotate([0, 0, 90]) USB();
                }
+          translate([corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
+          translate([width-corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
+          translate([corner_hole_inset, height-corner_hole_inset]) circle(d=corner_hole_diameter);
+          translate([width-corner_hole_inset, height-corner_hole_inset]) circle(d=corner_hole_diameter);
      }
 }
 
