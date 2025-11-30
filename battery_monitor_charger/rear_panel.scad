@@ -59,6 +59,10 @@ module rear_panel() {
                translate([205, 0]) rotate([0, 0, 90]) USB();
                translate([220, 0]) rotate([0, 0, 90]) USB();
                }
+          translate([0, 45]) {
+               translate([175, 0]) ethernet();
+               translate([210, 0]) ethernet();
+          }
           translate([corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
           translate([width-corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
           translate([corner_hole_inset, height-corner_hole_inset]) circle(d=corner_hole_diameter);
