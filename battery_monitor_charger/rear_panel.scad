@@ -51,17 +51,18 @@ module rear_panel() {
      difference() {
           square([width, height]);
           translate([0, 75]) {
-               translate([30, 0]) mains_inlet();
-               translate([80, 0]) mains_outlet();
-               translate([130, 0]) mains_outlet();
-               translate([170, 0]) rotate([0, 0, 90]) ethernet();
-               translate([190, 0]) rotate([0, 0, 90]) HDMI();
-               translate([205, 0]) rotate([0, 0, 90]) USB();
-               translate([220, 0]) rotate([0, 0, 90]) USB();
+               translate([204, 0]) mains_inlet();
+               translate([154, 0]) mains_outlet();
+               translate([104, 0]) mains_outlet();
+               translate([64, 0]) rotate([0, 0, 90]) ethernet();
+               translate([44, 0]) rotate([0, 0, 90]) USB();
+               translate([29, 0]) rotate([0, 0, 90]) USB();
+               translate([14, 0]) rotate([0, 0, 90]) USB();
                }
-          translate([0, 45]) {
-               translate([175, 0]) ethernet();
-               translate([210, 0]) ethernet();
+          translate([0, 50]) {
+               translate([60, 0]) HDMI();
+               translate([104, 0]) ethernet();
+               translate([154, 0]) ethernet();
           }
           translate([corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
           translate([width-corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
