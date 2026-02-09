@@ -15,6 +15,10 @@ module LCD_cutout() {
      translate([width-hole_inset_x, height+hole_outset_y]) circle(d=boltsize);
 }
 
+module button(x, y) {
+     translate([x, y]) circle(d=12);
+}
+
 module large_connector() {
      square([38, 17]);
 }
@@ -46,6 +50,8 @@ module front_panel() {
      difference() {
           square([width, height]);
           translate([10, 40]) LCD_cutout();
+          translate([75, 20]) button();
+          translate([95, 20]) button();
           translate([177, 70]) large_connector();
           translate([172, 40]) small_connector();
           translate([202, 40]) small_connector();
