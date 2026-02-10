@@ -19,9 +19,9 @@ module PLA_holder_slots() {
 
 module holder_plate(width) {
      union() {
-          translate([0, tab_depth]) square([width, 25]);
-          translate([(width-tab_width)/2, 0]) square([tab_width, tab_depth]);
-          }
+          translate([0, pla_tab_depth]) square([width, 25]);
+          translate([(width-pla_tab_width)/2, 0]) square([pla_tab_width, pla_tab_depth]);
+     }
 }
 
 module corner_holes(width, height, diameter, inset) {
@@ -44,7 +44,7 @@ module SSR_board() {
 
 module board_mounting_plate() {
      difference() {
-          square([240, 160]);
+          square([board_width, board_depth]);
           translate([10, 0]) square([100, 10]); /* for LCD */
           translate([120, 0]) square([38, 25]); /* for panel meter */
           union() {
