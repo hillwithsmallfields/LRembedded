@@ -43,7 +43,7 @@ module ethernet() {
 
 module multi_ethernet(n) {
      for (i = [0:n-1]) {
-          translate([i*50, 0]) ethernet();
+          translate([i*20, 0]) rotate(90) ethernet();
      }
 }
 
@@ -66,26 +66,22 @@ module audio() {
 }
 
 module rear_panel() {
-     width = 234;
-     height = 97;
-     corner_hole_inset = 4.5;
-     corner_hole_diameter = 3;
      difference() {
-          square([width, height]);
+          square([panel_width, panel_height]);
           translate([0, 75]) {
                translate([200, 0]) mains_inlet();
                translate([35, 0]) multi_outlet(2);
                translate([125, 0]) multi_USB(3);
                }
           translate([0, 50]) {
-               translate([25, 0]) multi_ethernet(3);
                translate([180, 0]) HDMI();
                translate([210, 0]) audio();
           }
-          translate([corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
-          translate([width-corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
-          translate([corner_hole_inset, height-corner_hole_inset]) circle(d=corner_hole_diameter);
-          translate([width-corner_hole_inset, height-corner_hole_inset]) circle(d=corner_hole_diameter);
+          translate([170, 25]) multi_ethernet(3);
+          translate([panel_corner_hole_inset, panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
+          translate([panel_width-panel_corner_hole_inset, panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
+          translate([panel_corner_hole_inset, panel_height-panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
+          translate([panel_width-panel_corner_hole_inset, panel_height-panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
      }
 }
 

@@ -1,18 +1,13 @@
 /* Front panel of garage computer / trickle charger */
 
+include <dimensions.scad>
+
 module LCD_cutout() {
-     width = 97;
-     height = 40;
-
-     hole_inset_x = 2;
-     hole_outset_y = 7.5;
-     boltsize = 3;
-
-     square([width, height]);
-     translate([hole_inset_x, -hole_outset_y]) circle(d=boltsize);
-     translate([hole_inset_x, height+hole_outset_y]) circle(d=boltsize);
-     translate([width-hole_inset_x, -hole_outset_y]) circle(d=boltsize);
-     translate([width-hole_inset_x, height+hole_outset_y]) circle(d=boltsize);
+     square([lcd_width, lcd_height]);
+     translate([lcd_hole_inset_x, -lcd_hole_outset_y]) circle(d=lcd_boltsize);
+     translate([lcd_hole_inset_x, height+lcd_hole_outset_y]) circle(d=lcd_boltsize);
+     translate([lcd_width-lcd_hole_inset_x, -lcd_hole_outset_y]) circle(d=lcd_boltsize);
+     translate([lcd_width-lcd_hole_inset_x, height+lcd_hole_outset_y]) circle(d=lcd_boltsize);
 }
 
 module button(x, y) {
@@ -43,12 +38,8 @@ module analog_meter() {
 }
 
 module front_panel() {
-     width = 234;
-     height = 97;
-     corner_hole_inset = 4.5;
-     corner_hole_diameter = 3;
      difference() {
-          square([width, height]);
+          square([panel_width, panel_height]);
           translate([10, 40]) LCD_cutout();
           translate([75, 20]) button();
           translate([95, 20]) button();
@@ -56,10 +47,10 @@ module front_panel() {
           translate([172, 40]) small_connector();
           translate([202, 40]) small_connector();
           translate([120, 40]) analog_meter();
-          translate([corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
-          translate([width-corner_hole_inset, corner_hole_inset]) circle(d=corner_hole_diameter);
-          translate([corner_hole_inset, height-corner_hole_inset]) circle(d=corner_hole_diameter);
-          translate([width-corner_hole_inset, height-corner_hole_inset]) circle(d=corner_hole_diameter);
+          translate([panel_corner_hole_inset, panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
+          translate([panel_width-panel_corner_hole_inset, panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
+          translate([panel_corner_hole_inset, panel_height-panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
+          translate([panel_width-panel_corner_hole_inset, panel_height-panel_corner_hole_inset]) circle(d=panel_corner_hole_diameter);
           }
 }
 

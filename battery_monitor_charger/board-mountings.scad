@@ -1,3 +1,7 @@
+/* mezzanine board mounting plate for trickle charger */
+
+include <dimensions.scad>
+
 module ethernet_hub_mounting() {
      /* hole and notch are 79mm apart, 19mm from back of board */
      translate([5, 20]) {
@@ -6,17 +10,12 @@ module ethernet_hub_mounting() {
      }
 }
 
-thickness = 3;
-
 module PLA_holder_slots() {
      /* Power Line Adaptor board is 58mm x 45mm */
      translate([0, 20]) square([thickness, 20]);
      translate([12.5, 0]) square([20, thickness]);
      translate([45, 20]) square([thickness, 20]);
 }
-
-tab_width = 20;
-tab_depth = thickness * 2;;
 
 module holder_plate(width) {
      union() {
@@ -30,6 +29,7 @@ module corner_holes(width, height, diameter, inset) {
      translate([width-inset, inset]) circle(d=diameter);
      translate([inset, height-inset]) circle(d=diameter);
      translate([width-inset, height-inset]) circle(d=diameter);
+     translate([width/2, height/2]) circle(d=hole_size);
 }
 
 module relays_board() {
@@ -47,8 +47,11 @@ module board_mounting_plate() {
           square([240, 160]);
           translate([10, 0]) square([100, 10]); /* for LCD */
           translate([120, 0]) square([38, 25]); /* for panel meter */
-          translate([120, 120]) circle(d=35);   /* for wires and heat to pass through */
-          translate([180, 120]) circle(d=35);   /* for wires and heat to pass through */
+          union() {
+               translate([120, 120]) circle(d=hole_size);   /* for wires and heat to pass through */
+               translate([120, 120-hole_size/2]) square([60, hole_size]);
+               translate([180, 120]) circle(d=hole_size);   /* for wires and heat to pass through */
+          }
           translate([150, 40]) ethernet_hub_mounting();
           translate([95, 40]) PLA_holder_slots();
           translate([15, 15]) relays_board();
